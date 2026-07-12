@@ -21,7 +21,7 @@ async def list_users(
     db: AsyncSession = Depends(get_db),
     _=Depends(require_roles("ADMIN", "ASSET_MANAGER")),
 ):
-    from app.crud import users as users_crud
+    import app.crud.users as users_crud
     query = await users_crud.list_users(db, search=search, role=role, status=status, department_id=department_id)
     result = await paginate(query, db, pagination)
     result["items"] = [UserResponse.model_validate(u).model_dump(by_alias=True) for u in result["items"]]

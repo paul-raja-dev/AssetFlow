@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.exceptions import AppError, app_error_handler, validation_error_handler
+from app.routers import auth, users, departments, asset_categories
 
 app = FastAPI(
     title="AssetFlow API",
@@ -46,12 +47,7 @@ async def health():
 
 
 # ── Routers ───────────────────────────────────────────────────────────────────
-from app.routers import auth, users  # noqa: E402
-
 app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 app.include_router(users.router, prefix="/api/users", tags=["Users"])
-
-# Departments & Categories — uncomment when friend's part is merged:
-# from app.routers import departments, asset_categories
-# app.include_router(departments.router, prefix="/api/departments", tags=["Departments"])
-# app.include_router(asset_categories.router, prefix="/api/asset-categories", tags=["Asset Categories"])
+app.include_router(departments.router, prefix="/api/departments", tags=["Departments"])
+app.include_router(asset_categories.router, prefix="/api/asset-categories", tags=["Asset Categories"])
