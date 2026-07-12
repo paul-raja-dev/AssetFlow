@@ -46,6 +46,7 @@ export default function AuthLayout({
   footerText,
   footerLinkText,
   footerLinkTo,
+  loading = false,
   children,
 }) {
   const location = useLocation();
@@ -143,11 +144,20 @@ export default function AuthLayout({
                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                   <button
                     type="submit"
-                    style={btn}
-                    onMouseEnter={(e) => (e.target.style.backgroundColor = "var(--color-primary-hover)")}
-                    onMouseLeave={(e) => (e.target.style.backgroundColor = "var(--color-primary)")}
+                    disabled={loading}
+                    style={{
+                      ...btn,
+                      opacity: loading ? 0.7 : 1,
+                      cursor: loading ? "not-allowed" : "pointer",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!loading) e.target.style.backgroundColor = "var(--color-primary-hover)";
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!loading) e.target.style.backgroundColor = "var(--color-primary)";
+                    }}
                   >
-                    {submitText}
+                    {loading ? "Processing..." : submitText}
                   </button>
 
                   <p

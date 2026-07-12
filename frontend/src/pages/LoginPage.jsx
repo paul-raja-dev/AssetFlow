@@ -1,5 +1,7 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/layout/AuthLayout";
+import useAuth from "../hooks/useAuth";
 
 /* ─── shared inline styles ─────────────────────────────────────────────── */
 const label = {
@@ -10,7 +12,7 @@ const label = {
   color: "var(--color-text-secondary)",
 };
 
-const input = {
+const inputStyle = {
   display: "block",
   width: "100%",
   height: 38,
@@ -24,10 +26,43 @@ const input = {
   transition: "border-color 0.15s",
 };
 
+const errorContainer = {
+  padding: "8px 12px",
+  backgroundColor: "var(--color-page)",
+  border: "1px solid #ef4444",
+  borderRadius: 6,
+  color: "#ef4444",
+  fontSize: 13,
+  fontWeight: 500,
+};
+
 export default function LoginPage() {
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // handle login logic
+    setError("");
+
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await login(email, password);
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message || "Invalid credentials. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -39,7 +74,11 @@ export default function LoginPage() {
       footerText="Don't have an account?"
       footerLinkText="Register"
       footerLinkTo="/signup"
+      loading={loading}
     >
+      {/* error banner */}
+      {error && <div style={errorContainer}>{error}</div>}
+
       {/* email */}
       <div>
         <label htmlFor="login-email" style={label}>
@@ -50,7 +89,9 @@ export default function LoginPage() {
           type="email"
           autoComplete="email"
           placeholder="you@company.com"
-          style={input}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={inputStyle}
           onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
           onBlur={(e) => (e.target.style.borderColor = "var(--color-border)")}
         />
@@ -74,7 +115,9 @@ export default function LoginPage() {
           type="password"
           autoComplete="current-password"
           placeholder="••••••••"
-          style={input}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={inputStyle}
           onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
           onBlur={(e) => (e.target.style.borderColor = "var(--color-border)")}
         />
