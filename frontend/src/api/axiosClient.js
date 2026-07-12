@@ -1,10 +1,13 @@
 import axios from "axios";
 
 const prodBaseURL = "https://assetflow-production-20a8.up.railway.app/api/";
-const localBaseURL = "http://localhost:8000/api/";
+const localBaseURL = "http://localhost:8002/api/";
 
 // Read from env but ensure it has a trailing slash if specified
 let defaultURL = import.meta.env.VITE_API_BASE_URL || prodBaseURL;
+if (!import.meta.env.VITE_API_BASE_URL) {
+  defaultURL = localBaseURL;
+}
 if (defaultURL && !defaultURL.endsWith("/")) {
   defaultURL += "/";
 }
@@ -41,7 +44,7 @@ axiosClient.interceptors.response.use(
       originalRequest._retryLocal = true;
       
       console.warn(
-        "Production backend unreachable. Dynamically switching base URL to local instance at http://localhost:8000/api/..."
+        "Production backend unreachable. Dynamically switching base URL to local instance at http://localhost:8002/api/..."
       );
       
       // Update defaults for future requests
