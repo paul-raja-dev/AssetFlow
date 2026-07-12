@@ -1,6 +1,6 @@
 import useAuth from "../hooks/useAuth";
 import { Link } from "react-router-dom";
-import { Laptop, Calendar, Wrench, AlertCircle, ArrowRight } from "lucide-react";
+import { Laptop, Calendar, Wrench, ArrowRight } from "lucide-react";
 
 const gridStyle = {
   display: "grid",
@@ -48,67 +48,8 @@ const listStyle = {
   marginTop: 16,
 };
 
-const listItemStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: "12px 16px",
-  backgroundColor: "var(--color-page)",
-  borderRadius: 8,
-  border: "1px solid var(--color-border)",
-};
-
 export default function DashboardPage() {
   const { user } = useAuth();
-
-  // Mock statistics/data based on the specific test user logged in
-  const getMockData = () => {
-    switch (user?.email) {
-      case "alice@company.com":
-        return {
-          assetsCount: 1,
-          bookingsCount: 0,
-          maintenanceCount: 0,
-          allocations: [
-            { tag: "AF-0022", name: "Dell UltraSharp 32\" 4K Monitor", date: "2026-07-01", status: "Active" },
-          ],
-          bookings: [],
-        };
-      case "bob@company.com":
-        return {
-          assetsCount: 1,
-          bookingsCount: 1,
-          maintenanceCount: 1,
-          allocations: [
-            { tag: "AF-0010", name: "iPad Pro 11\" (M2, Cellular)", date: "2026-05-15", status: "Overdue" },
-          ],
-          bookings: [
-            { resource: "Conf Room C", time: "Today, 14:00 - 15:30", status: "Confirmed" }
-          ],
-        };
-      case "charlie@company.com":
-        return {
-          assetsCount: 0,
-          bookingsCount: 2,
-          maintenanceCount: 0,
-          allocations: [],
-          bookings: [
-            { resource: "Company Tesla Model 3", time: "2026-07-13, 09:00 - 17:00", status: "Confirmed" },
-            { resource: "Conf Room B", time: "2026-07-14, 11:00 - 12:00", status: "Confirmed" }
-          ],
-        };
-      default:
-        return {
-          assetsCount: 0,
-          bookingsCount: 0,
-          maintenanceCount: 0,
-          allocations: [],
-          bookings: [],
-        };
-    }
-  };
-
-  const data = getMockData();
 
   return (
     <div style={{ fontFamily: "var(--font-sans)", color: "var(--color-text-primary)" }}>
@@ -118,7 +59,7 @@ export default function DashboardPage() {
           Welcome back, {user?.name}
         </h2>
         <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>
-          Role: <strong style={{ color: "var(--color-primary)" }}>{user?.role}</strong> · Department: <strong>{user?.department}</strong> · Location: <strong>Main Office</strong>
+          Role: <strong style={{ color: "var(--color-primary)" }}>{user?.role}</strong> · Department ID: <strong>{user?.departmentId || "Not Assigned"}</strong> · Status: <strong style={{ color: "#10b981" }}>{user?.status}</strong>
         </p>
       </div>
 
@@ -130,7 +71,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <div style={{ fontSize: 12, color: "var(--color-text-muted)", fontWeight: 500 }}>Allocated Assets</div>
-            <div style={{ fontSize: 24, fontWeight: 700, marginTop: 4 }}>{data.assetsCount}</div>
+            <div style={{ fontSize: 24, fontWeight: 700, marginTop: 4 }}>0</div>
           </div>
         </div>
 
@@ -140,7 +81,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <div style={{ fontSize: 12, color: "var(--color-text-muted)", fontWeight: 500 }}>Active Bookings</div>
-            <div style={{ fontSize: 24, fontWeight: 700, marginTop: 4 }}>{data.bookingsCount}</div>
+            <div style={{ fontSize: 24, fontWeight: 700, marginTop: 4 }}>0</div>
           </div>
         </div>
 
@@ -150,7 +91,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <div style={{ fontSize: 12, color: "var(--color-text-muted)", fontWeight: 500 }}>Maintenance Tickets</div>
-            <div style={{ fontSize: 24, fontWeight: 700, marginTop: 4 }}>{data.maintenanceCount}</div>
+            <div style={{ fontSize: 24, fontWeight: 700, marginTop: 4 }}>0</div>
           </div>
         </div>
       </div>
@@ -165,32 +106,9 @@ export default function DashboardPage() {
           </p>
 
           <div style={listStyle}>
-            {data.allocations.length === 0 ? (
-              <div style={{ fontSize: 13, color: "var(--color-text-muted)", padding: "16px 0", textAlign: "center" }}>
-                No active asset allocations.
-              </div>
-            ) : (
-              data.allocations.map((alloc) => (
-                <div key={alloc.tag} style={listItemStyle}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    <span style={{ fontSize: 14, fontWeight: 600 }}>{alloc.name}</span>
-                    <span style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--color-text-muted)" }}>
-                      Tag: {alloc.tag} · Assigned: {alloc.date}
-                    </span>
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      color: alloc.status === "Overdue" ? "#ef4444" : "#10b981",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {alloc.status}
-                  </span>
-                </div>
-              ))
-            )}
+            <div style={{ fontSize: 13, color: "var(--color-text-muted)", padding: "16px 0", textAlign: "center" }}>
+              No active asset allocations.
+            </div>
           </div>
         </div>
 
@@ -200,23 +118,9 @@ export default function DashboardPage() {
           <div style={{ ...sectionStyle, marginBottom: 0 }}>
             <h3 style={{ fontFamily: "var(--font-heading)", fontSize: 16, fontWeight: 700 }}>Upcoming Bookings</h3>
             <div style={listStyle}>
-              {data.bookings.length === 0 ? (
-                <div style={{ fontSize: 13, color: "var(--color-text-muted)", padding: "16px 0", textAlign: "center" }}>
-                  No upcoming room or vehicle bookings.
-                </div>
-              ) : (
-                data.bookings.map((booking) => (
-                  <div key={booking.resource} style={listItemStyle}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      <span style={{ fontSize: 14, fontWeight: 600 }}>{booking.resource}</span>
-                      <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{booking.time}</span>
-                    </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-primary)" }}>
-                      {booking.status}
-                    </span>
-                  </div>
-                ))
-              )}
+              <div style={{ fontSize: 13, color: "var(--color-text-muted)", padding: "16px 0", textAlign: "center" }}>
+                No upcoming room or vehicle bookings.
+              </div>
             </div>
           </div>
 
