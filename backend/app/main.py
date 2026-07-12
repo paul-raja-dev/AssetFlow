@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.exceptions import AppError, app_error_handler, validation_error_handler
-from app.routers import auth, users, departments, asset_categories, assets, allocations, transfer_requests
+from app.routers import auth, users, departments, asset_categories, assets, allocations, transfer_requests, bookings, maintenance_requests
 
 app = FastAPI(
     title="AssetFlow API",
@@ -54,3 +54,5 @@ app.include_router(asset_categories.router, prefix="/api/asset-categories", tags
 app.include_router(assets.router, prefix="/api/assets", tags=["Assets"])
 app.include_router(allocations.router, prefix="/api/allocations", tags=["Allocations"])
 app.include_router(transfer_requests.router, prefix="/api/transfer-requests", tags=["Transfer Requests"])
+app.include_router(bookings.router, prefix="/api/bookings", tags=["Bookings"])
+app.include_router(maintenance_requests.router, prefix="/api/maintenance-requests", tags=["Maintenance"])
