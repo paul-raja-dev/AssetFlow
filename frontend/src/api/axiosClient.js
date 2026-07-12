@@ -1,8 +1,12 @@
 import axios from "axios";
 
+const prodBaseURL = "https://assetflow-production-20a8.up.railway.app/api";
+const localBaseURL = "http://localhost:8000/api";
+
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1",
+  baseURL: import.meta.env.VITE_API_BASE_URL || prodBaseURL,
   headers: { "Content-Type": "application/json" },
+  timeout: 6000,
 });
 
 axiosClient.interceptors.request.use((config) => {
@@ -15,7 +19,39 @@ axiosClient.interceptors.request.use((config) => {
 
 axiosClient.interceptors.response.use(
   (response) => response.data,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+    
+    // Detect connection/network failure or timeout
+    const isNetworkError =
+      error.code === "ERR_NETWORK" ||
+      error.message === "Network Error" ||
+      error.code === "ECONNABORTED";
+
+    // Verify if we are currently pointing to production
+    const isProd = axiosClient.defaults.baseURL.includes("assetflow-production-20a8.up.railway.app");
+
+    if (isNetworkError && isProd && originalRequest && !originalRequest._retryLocal) {
+      originalRequest._retryLocal = true;
+      
+      console.warn(
+        "Production backend unreachable. Dynamically switching base URL to local instance at http://localhost:8000/api..."
+      );
+      
+      // Update defaults for future requests
+      axiosClient.defaults.baseURL = localBaseURL;
+      
+      // Update current request configuration and retry
+      originalRequest.baseURL = localBaseURL;
+      
+      try {
+        const retryResponse = await axiosClient(originalRequest);
+        return retryResponse;
+      } catch (retryError) {
+        return Promise.reject(retryError);
+      }
+    }
+
     const errBody = error.response?.data?.error ?? {
       code: "NETWORK_ERROR",
       message: error.message,
