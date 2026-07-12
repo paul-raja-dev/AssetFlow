@@ -24,11 +24,7 @@ if config.config_file_name is not None:
 # Import Base + all models so autogenerate sees every table
 from app.core.database import Base  # noqa: E402
 
-# Import models here as they are created (uncomment per phase)
-# from app.models import user, department, asset_category     # Phase 2
-# from app.models import asset                                 # Phase 3
-# from app.models import allocation, transfer_request, booking # Phase 4
-# from app.models import maintenance_request, audit_cycle, audit_item, notification, activity_log  # Phase 5
+import app.models  # registers all models with Base.metadata  # noqa: F401, E402
 
 target_metadata = Base.metadata
 
