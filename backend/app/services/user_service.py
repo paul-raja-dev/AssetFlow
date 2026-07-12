@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud import users as users_crud
+import app.crud.users as users_crud
 from app.exceptions import AppError
 from app.models.user import User
 
