@@ -1,79 +1,91 @@
-import { Link, useLocation } from "react-router-dom";
+import AuthLayout from "../components/layout/AuthLayout";
+
+/* ─── shared inline styles ─────────────────────────────────────────────── */
+const label = {
+  display: "block",
+  marginBottom: 6,
+  fontSize: 13,
+  fontWeight: 500,
+  color: "var(--color-text-secondary)",
+};
+
+const input = {
+  display: "block",
+  width: "100%",
+  height: 38,
+  padding: "0 12px",
+  fontSize: 14,
+  color: "var(--color-text-primary)",
+  backgroundColor: "var(--color-input-bg)",
+  border: "1px solid var(--color-border)",
+  borderRadius: 8,
+  outline: "none",
+  transition: "border-color 0.15s",
+};
 
 export default function SignupPage() {
-  const location = useLocation();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // handle register logic
+  };
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-sm">
-        {/* Tabs */}
-        <div className="flex border-b">
-          <Link
-            to="/login"
-            className={`flex-1 pb-2 text-center text-sm font-medium ${location.pathname === "/login"
-              ? "border-b-2 border-black"
-              : ""
-              }`}
-          >
-            Login
-          </Link>
-          <Link
-            to="/signup"
-            className={`flex-1 pb-2 text-center text-sm font-medium ${location.pathname === "/signup"
-              ? "border-b-2 border-black"
-              : ""
-              }`}
-          >
-            Register
-          </Link>
-        </div>
-
-        {/* Form */}
-        <form className="mt-6 space-y-4">
-          <div>
-            <label htmlFor="signup-name" className="block text-sm">
-              Full name
-            </label>
-            <input
-              id="signup-name"
-              type="text"
-              autoComplete="name"
-              className="mt-1 block w-full border px-3 py-2 text-sm"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="signup-email" className="block text-sm">
-              Email
-            </label>
-            <input
-              id="signup-email"
-              type="email"
-              autoComplete="email"
-              className="mt-1 block w-full border px-3 py-2 text-sm"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="signup-password" className="block text-sm">
-              Password
-            </label>
-            <input
-              id="signup-password"
-              type="password"
-              autoComplete="new-password"
-              className="mt-1 block w-full border px-3 py-2 text-sm"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full border px-3 py-2 text-sm font-medium"
-          >
-            Create account
-          </button>
-        </form>
+    <AuthLayout
+      title="Create an account"
+      subtitle="Join your organization on AssetFlow"
+      submitText="Create account"
+      onSubmit={handleSubmit}
+      footerText="Already have an account?"
+      footerLinkText="Sign in"
+      footerLinkTo="/login"
+    >
+      {/* full name */}
+      <div>
+        <label htmlFor="signup-name" style={label}>
+          Full name
+        </label>
+        <input
+          id="signup-name"
+          type="text"
+          autoComplete="name"
+          placeholder="Jane Doe"
+          style={input}
+          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
+          onBlur={(e) => (e.target.style.borderColor = "var(--color-border)")}
+        />
       </div>
-    </div>
+
+      {/* email */}
+      <div>
+        <label htmlFor="signup-email" style={label}>
+          Email address
+        </label>
+        <input
+          id="signup-email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@company.com"
+          style={input}
+          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
+          onBlur={(e) => (e.target.style.borderColor = "var(--color-border)")}
+        />
+      </div>
+
+      {/* password */}
+      <div>
+        <label htmlFor="signup-password" style={label}>
+          Password
+        </label>
+        <input
+          id="signup-password"
+          type="password"
+          autoComplete="new-password"
+          placeholder="••••••••"
+          style={input}
+          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
+          onBlur={(e) => (e.target.style.borderColor = "var(--color-border)")}
+        />
+      </div>
+    </AuthLayout>
   );
 }

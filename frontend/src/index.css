@@ -1,20 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+@theme {
+  --color-page:           #f1f5f9;
+  --color-surface:        #ffffff;
+  --color-surface-hover:  #f8fafc;
+  --color-primary:        #2563eb;
+  --color-primary-hover:  #1d4ed8;
+  --color-accent:         #dbeafe;
+  --color-border:         #e2e8f0;
+  --color-border-light:   #f1f5f9;
+  --color-text-primary:   #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted:     #9ca3af;
+  --color-input-bg:       #ffffff;
+  --color-sidebar:        #0f172a;
+  --color-navbar:         #ffffff;
+
+  --color-primary-text:   #ffffff;
+
+  --font-sans:    "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "IBM Plex Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
 }
 
-html,
-body,
-#root{
-  width:100%;
-  min-height:100%;
+.dark {
+  --color-page:           #0a0a0a;
+  --color-surface:        #121212;
+  --color-surface-hover:  #1c1c1e;
+  --color-primary:        #ffffff;
+  --color-primary-hover:  #e4e4e7;
+  --color-primary-text:   #000000;
+  --color-accent:         #27272a;
+  --color-border:         #262626;
+  --color-border-light:   #1f1f1f;
+  --color-text-primary:   #f4f4f5;
+  --color-text-secondary: #a1a1aa;
+  --color-text-muted:     #71717a;
+  --color-input-bg:       #0e0e0e;
+  --color-sidebar:        #09090b;
+  --color-navbar:         #121212;
 }
 
-body{
-  font-family:Inter,sans-serif;
-  background:#f8fafc;
-  color:#111827;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-page);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s, color 0.2s;
 }
