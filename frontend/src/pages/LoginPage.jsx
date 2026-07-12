@@ -1,75 +1,84 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+import AuthLayout from "../components/layout/AuthLayout";
+
+/* ─── shared inline styles ─────────────────────────────────────────────── */
+const label = {
+  display: "block",
+  marginBottom: 6,
+  fontSize: 13,
+  fontWeight: 500,
+  color: "var(--color-text-secondary)",
+};
+
+const input = {
+  display: "block",
+  width: "100%",
+  height: 38,
+  padding: "0 12px",
+  fontSize: 14,
+  color: "var(--color-text-primary)",
+  backgroundColor: "var(--color-input-bg)",
+  border: "1px solid var(--color-border)",
+  borderRadius: 8,
+  outline: "none",
+  transition: "border-color 0.15s",
+};
 
 export default function LoginPage() {
-  const location = useLocation();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // handle login logic
+  };
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-sm">
-        {/* Tabs */}
-        <div className="flex border-b">
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Sign in to your AssetFlow account"
+      submitText="Sign in"
+      onSubmit={handleSubmit}
+      footerText="Don't have an account?"
+      footerLinkText="Register"
+      footerLinkTo="/signup"
+    >
+      {/* email */}
+      <div>
+        <label htmlFor="login-email" style={label}>
+          Email address
+        </label>
+        <input
+          id="login-email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@company.com"
+          style={input}
+          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
+          onBlur={(e) => (e.target.style.borderColor = "var(--color-border)")}
+        />
+      </div>
+
+      {/* password */}
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+          <label htmlFor="login-password" style={{ ...label, margin: 0 }}>
+            Password
+          </label>
           <Link
-            to="/login"
-            className={`flex-1 pb-2 text-center text-sm font-medium ${
-              location.pathname === "/login"
-                ? "border-b-2 border-black"
-                : ""
-            }`}
+            to="/forgot-password"
+            style={{ fontSize: 12, fontWeight: 500, color: "var(--color-primary)", textDecoration: "none" }}
           >
-            Login
-          </Link>
-          <Link
-            to="/signup"
-            className={`flex-1 pb-2 text-center text-sm font-medium ${
-              location.pathname === "/signup"
-                ? "border-b-2 border-black"
-                : ""
-            }`}
-          >
-            Register
-          </Link>
-        </div>
-
-        {/* Form */}
-        <form className="mt-6 space-y-4">
-          <div>
-            <label htmlFor="login-email" className="block text-sm">
-              Email
-            </label>
-            <input
-              id="login-email"
-              type="email"
-              autoComplete="email"
-              className="mt-1 block w-full border px-3 py-2 text-sm"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="login-password" className="block text-sm">
-              Password
-            </label>
-            <input
-              id="login-password"
-              type="password"
-              autoComplete="current-password"
-              className="mt-1 block w-full border px-3 py-2 text-sm"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full border px-3 py-2 text-sm font-medium"
-          >
-            Sign in
-          </button>
-        </form>
-
-        <div className="mt-4 text-center">
-          <Link to="/forgot-password" className="text-sm underline">
             Forgot password?
           </Link>
         </div>
+        <input
+          id="login-password"
+          type="password"
+          autoComplete="current-password"
+          placeholder="••••••••"
+          style={input}
+          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
+          onBlur={(e) => (e.target.style.borderColor = "var(--color-border)")}
+        />
       </div>
-    </div>
+    </AuthLayout>
   );
 }
