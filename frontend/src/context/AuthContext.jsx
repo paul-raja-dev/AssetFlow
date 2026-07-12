@@ -3,6 +3,17 @@ import * as authApi from "../api/authApi";
 
 export const AuthContext = createContext(null);
 
+const formatUser = (userData) => {
+  if (!userData) return null;
+  if (!userData.name && userData.firstName) {
+    return {
+      ...userData,
+      name: `${userData.firstName} ${userData.lastName || ""}`.trim(),
+    };
+  }
+  return userData;
+};
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,9 +31,8 @@ export function AuthProvider({ children }) {
 
     try {
       const res = await authApi.getMe();
-      // Handle wrapped or raw user shape from response
       const userData = res.data || res;
-      setUser(userData);
+      setUser(formatUser(userData));
     } catch (err) {
       console.error("Session validation failed on startup:", err);
       // Clear invalid session tokens
@@ -39,14 +49,17 @@ export function AuthProvider({ children }) {
     try {
       const res = await authApi.login({ email, password });
       
-      // Extract from response structure
       const authData = res.data || res;
       const { accessToken, refreshToken, user: loggedInUser } = authData;
 
       localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("currentUser", JSON.stringify(loggedInUser));
-      setUser(loggedInUser);
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
+      }
+      
+      const formattedUser = formatUser(loggedInUser);
+      localStorage.setItem("currentUser", JSON.stringify(formattedUser));
+      setUser(formattedUser);
       return res;
     } catch (err) {
       throw err;
@@ -54,8 +67,19 @@ export function AuthProvider({ children }) {
   };
 
   const signup = async (name, email, password) => {
+    // Split full name into first and last name
+    const parts = name.trim().split(/\s+/);
+    const firstName = parts[0] || "";
+    const lastName = parts.slice(1).join(" ") || firstName; // fallback if no last name is provided
+
     try {
-      const res = await authApi.signup({ name, email, password });
+      const res = await authApi.signup({
+        firstName,
+        lastName,
+        email,
+        password,
+        role: "EMPLOYEE",
+      });
       return res;
     } catch (err) {
       throw err;
