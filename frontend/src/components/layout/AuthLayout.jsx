@@ -124,8 +124,8 @@ export default function AuthLayout({
               </Link>
             </div>
 
-            {/* form body — same height and flex structure so size never shifts */}
-            <div style={{ padding: "28px 28px 32px", height: 380, display: "flex", flexDirection: "column" }}>
+            {/* form body — same minHeight and flex structure so size never shifts */}
+            <div style={{ padding: "28px 28px 32px", minHeight: 380, display: "flex", flexDirection: "column" }}>
               <form
                 onSubmit={onSubmit}
                 style={{
