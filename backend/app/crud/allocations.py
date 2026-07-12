@@ -44,9 +44,7 @@ def build_list_query(
     status: str | None = None,
     overdue_only: bool = False,
 ):
-    from sqlalchemy import and_, or_
     from app.models.allocation import Allocation as A
-    import datetime, timezone
 
     query = select(A)
     if asset_id:

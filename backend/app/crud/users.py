@@ -32,6 +32,13 @@ async def update(db: AsyncSession, user: User, **kwargs) -> User:
     return user
 
 
+async def get_active_by_roles(db: AsyncSession, *roles: str) -> list[User]:
+    result = await db.execute(
+        select(User).where(User.role.in_(roles), User.status == "ACTIVE")
+    )
+    return result.scalars().all()
+
+
 async def list_users(
     db: AsyncSession,
     search: str | None = None,

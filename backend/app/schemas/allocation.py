@@ -26,6 +26,12 @@ class AllocationCreate(CamelModel):
         return self
 
 
+class AllocationReturn(CamelModel):
+    """Optional check-in details captured when an asset is returned."""
+    condition: Optional[Literal["GOOD", "FAIR", "POOR", "DAMAGED"]] = None
+    return_notes: Optional[str] = None
+
+
 class AllocationResponse(CamelModel):
     id: str
     asset_id: str

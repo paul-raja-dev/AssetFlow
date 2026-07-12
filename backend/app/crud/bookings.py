@@ -23,8 +23,8 @@ async def has_overlap(
     )
     if exclude_id:
         query = query.where(Booking.id != exclude_id)
-    result = await db.execute(query)
-    return result.scalar_one_or_none() is not None
+    result = await db.execute(query.limit(1))
+    return result.scalars().first() is not None
 
 
 async def create(db: AsyncSession, **kwargs) -> Booking:

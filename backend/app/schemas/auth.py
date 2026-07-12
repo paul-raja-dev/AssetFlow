@@ -6,7 +6,7 @@ from pydantic import EmailStr, Field
 from app.schemas.base import CamelModel
 
 # ── Enums (as Literals) ───────────────────────────────────────────────────────
-UserRole = Literal["ADMIN", "ASSET_MANAGER", "EMPLOYEE"]
+UserRole = Literal["ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD", "EMPLOYEE"]
 UserStatus = Literal["ACTIVE", "INACTIVE"]
 
 
@@ -16,7 +16,8 @@ class SignupRequest(CamelModel):
     password: str = Field(min_length=6)
     first_name: str
     last_name: str
-    role: UserRole = "EMPLOYEE"
+    # NOTE: no role field — signup always creates an EMPLOYEE account.
+    # Roles are assigned only by Admin from the Employee Directory (PS Screen 3).
 
 
 class LoginRequest(CamelModel):

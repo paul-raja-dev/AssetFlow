@@ -1,20 +1,25 @@
 from datetime import datetime, timedelta, timezone
 
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from app.core.config import settings
 
 # ---------- bcrypt ----------
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Uses the bcrypt library directly: passlib 1.7.4 is incompatible with
+# bcrypt >= 4.1 (crashes during backend detection). Hash format ($2b$)
+# is identical, so existing hashes keep verifying.
 
 
 def hash_password(plain: str) -> str:
-    return pwd_context.hash(plain)
+    return bcrypt.hashpw(plain.encode("utf-8")[:72], bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    try:
+        return bcrypt.checkpw(plain.encode("utf-8")[:72], hashed.encode("utf-8"))
+    except ValueError:
+        return False
 
 
 # ---------- JWT ----------

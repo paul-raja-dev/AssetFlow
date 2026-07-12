@@ -63,5 +63,6 @@ class MaintenanceRequest(Base):
             "asset_id",
             unique=True,
             postgresql_where=status.notin_(["REJECTED", "RESOLVED"]),
+            sqlite_where=status.notin_(["REJECTED", "RESOLVED"]),
         ),
     )

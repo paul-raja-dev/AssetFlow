@@ -1,40 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import AuthLayout from "../components/layout/AuthLayout";
+import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
+import AuthShell from "../components/layout/AuthShell";
+import { Button, Field } from "../components/ui";
 import useAuth from "../hooks/useAuth";
-
-/* ─── shared inline styles ─────────────────────────────────────────────── */
-const label = {
-  display: "block",
-  marginBottom: 6,
-  fontSize: 13,
-  fontWeight: 500,
-  color: "var(--color-text-secondary)",
-};
-
-const inputStyle = {
-  display: "block",
-  width: "100%",
-  height: 38,
-  padding: "0 12px",
-  fontSize: 14,
-  color: "var(--color-text-primary)",
-  backgroundColor: "var(--color-input-bg)",
-  border: "1px solid var(--color-border)",
-  borderRadius: 8,
-  outline: "none",
-  transition: "border-color 0.15s",
-};
-
-const errorContainer = {
-  padding: "8px 12px",
-  backgroundColor: "var(--color-page)",
-  border: "1px solid #ef4444",
-  borderRadius: 6,
-  color: "#ef4444",
-  fontSize: 13,
-  fontWeight: 500,
-};
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -42,86 +11,93 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    if (!email || !password) {
-      setError("Please fill in all fields.");
+    if (!email.trim() || !password) {
+      setError("Please enter your email and password.");
       return;
     }
-
     setLoading(true);
     try {
-      await login(email, password);
+      await login(email.trim(), password);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message || "Invalid credentials. Please try again.");
+      setError(err?.message || "Unable to sign in. Please check your credentials.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AuthLayout
+    <AuthShell
       title="Welcome back"
-      subtitle="Sign in to your AssetFlow account"
-      submitText="Sign in"
-      onSubmit={handleSubmit}
-      footerText="Don't have an account?"
-      footerLinkText="Register"
-      footerLinkTo="/signup"
-      loading={loading}
-    >
-      {/* error banner */}
-      {error && <div style={errorContainer}>{error}</div>}
-
-      {/* email */}
-      <div>
-        <label htmlFor="login-email" style={label}>
-          Email address
-        </label>
-        <input
-          id="login-email"
-          type="email"
-          autoComplete="email"
-          placeholder="you@company.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={inputStyle}
-          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
-          onBlur={(e) => (e.target.style.borderColor = "var(--color-border)")}
-        />
-      </div>
-
-      {/* password */}
-      <div>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-          <label htmlFor="login-password" style={{ ...label, margin: 0 }}>
-            Password
-          </label>
-          <Link
-            to="/forgot-password"
-            style={{ fontSize: 12, fontWeight: 500, color: "var(--color-primary)", textDecoration: "none" }}
-          >
-            Forgot password?
+      subtitle="Sign in to your workspace to continue."
+      footer={
+        <>
+          New to AssetFlow?{" "}
+          <Link to="/signup" className="font-semibold" style={{ color: "var(--color-primary)" }}>
+            Create an account
           </Link>
-        </div>
-        <input
-          id="login-password"
-          type="password"
-          autoComplete="current-password"
-          placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={inputStyle}
-          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
-          onBlur={(e) => (e.target.style.borderColor = "var(--color-border)")}
-        />
-      </div>
-    </AuthLayout>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        {error && (
+          <div
+            className="flex items-start gap-2 rounded-lg px-3 py-2.5 text-[13px] font-medium"
+            style={{ background: "var(--color-danger-bg)", color: "var(--color-danger)" }}
+            role="alert"
+          >
+            <AlertCircle size={15} className="mt-0.5 shrink-0" />
+            {error}
+          </div>
+        )}
+
+        <Field label="Email address" required>
+          <input
+            type="email"
+            className="input"
+            placeholder="you@company.com"
+            value={email}
+            autoComplete="email"
+            autoFocus
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </Field>
+
+        <Field label="Password" required>
+          <div className="relative">
+            <input
+              type={showPw ? "text" : "password"}
+              className="input pr-10"
+              placeholder="••••••••"
+              value={password}
+              autoComplete="current-password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setShowPw((s) => !s)}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer"
+              style={{ color: "var(--color-text-muted)" }}
+              aria-label={showPw ? "Hide password" : "Show password"}
+            >
+              {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+        </Field>
+
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading && <Loader2 size={15} className="animate-spin" />}
+          {loading ? "Signing in…" : "Sign in"}
+        </Button>
+      </form>
+    </AuthShell>
   );
 }

@@ -78,7 +78,6 @@ export function AuthProvider({ children }) {
         lastName,
         email,
         password,
-        role: "EMPLOYEE",
       });
       return res;
     } catch (err) {
@@ -87,19 +86,10 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    const token = localStorage.getItem("accessToken");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("currentUser");
     setUser(null);
-
-    if (token) {
-      try {
-        await authApi.logout();
-      } catch (err) {
-        console.error("Logout API call failed:", err);
-      }
-    }
   };
 
   const value = {

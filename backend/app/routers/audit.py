@@ -7,7 +7,12 @@ from app.core.responses import ok
 from app.dependencies.auth import get_current_user, require_roles
 from app.models.audit_cycle import AuditCycle
 from app.models.audit_item import AuditItem
-from app.schemas.audit import AuditCycleCreate, AuditItemResponse, AuditItemUpdate
+from app.schemas.audit import (
+    AuditCycleCreate,
+    AuditItemResponse,
+    AuditItemUpdate,
+    DiscrepancyResponse,
+)
 from app.services import audit_service
 
 router = APIRouter()
@@ -96,12 +101,28 @@ async def close_cycle(
     )
 
 
+@router.get("/{id}/discrepancies")
+async def list_discrepancies(
+    id: str,
+    db: AsyncSession = Depends(get_db),
+    _=Depends(require_roles("ADMIN", "ASSET_MANAGER")),
+):
+    """Auto-generated discrepancy report: items marked MISSING or DAMAGED."""
+    rows = await audit_service.list_discrepancies(db, id)
+    return ok(
+        data=[
+            DiscrepancyResponse.model_validate(r).model_dump(by_alias=True)
+            for r in rows
+        ],
+    )
+
+
 @router.get("/{id}/items")
 async def list_items(
     id: str,
     result: str | None = Query(None),
     db: AsyncSession = Depends(get_db),
-    _=Depends(require_roles("ADMIN", "ASSET_MANAGER", "EMPLOYEE")),
+    _=Depends(require_roles("ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD", "EMPLOYEE")),
 ):
     """List audit items for a cycle — auditors and ADMIN / ASSET_MANAGER."""
     items = await audit_service.list_items(db, id, result_filter=result)
@@ -119,7 +140,7 @@ async def update_item(
     item_id: str,
     body: AuditItemUpdate,
     db: AsyncSession = Depends(get_db),
-    user=Depends(require_roles("ADMIN", "ASSET_MANAGER", "EMPLOYEE")),
+    user=Depends(require_roles("ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD", "EMPLOYEE")),
 ):
     """Update an audit item's result — auditors and ADMIN / ASSET_MANAGER."""
     item = await audit_service.update_item(

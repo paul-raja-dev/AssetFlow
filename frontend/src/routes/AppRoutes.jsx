@@ -2,18 +2,28 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
 import DashboardPage from "../pages/DashboardPage";
-import PlaceholderPage from "../pages/PlaceholderPage";
+import AssetsPage from "../pages/AssetsPage";
+import AssetDetailPage from "../pages/AssetDetailPage";
+import AllocationsPage from "../pages/AllocationsPage";
+import TransfersPage from "../pages/TransfersPage";
+import BookingsPage from "../pages/BookingsPage";
+import MaintenancePage from "../pages/MaintenancePage";
+import AuditsPage from "../pages/AuditsPage";
+import AuditCycleDetailPage from "../pages/AuditCycleDetailPage";
+import OrganizationPage from "../pages/OrganizationPage";
+import NotificationsPage from "../pages/NotificationsPage";
+import SettingsPage from "../pages/SettingsPage";
 import AppLayout from "../components/layout/AppLayout";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Public Routes */}
+      {/* Public */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
 
-      {/* Protected Layout Routes */}
+      {/* Authenticated app */}
       <Route
         element={
           <ProtectedRoute>
@@ -22,19 +32,28 @@ export default function AppRoutes() {
         }
       >
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/organization-setup" element={<PlaceholderPage title="Organization Setup" />} />
-        <Route path="/assets" element={<PlaceholderPage title="Asset Directory" />} />
-        <Route path="/assets/:assetId" element={<PlaceholderPage title="Asset Detail" />} />
-        <Route path="/allocations" element={<PlaceholderPage title="Allocations" />} />
-        <Route path="/bookings" element={<PlaceholderPage title="Bookings" />} />
-        <Route path="/maintenance" element={<PlaceholderPage title="Maintenance" />} />
-        <Route path="/audits" element={<PlaceholderPage title="Audits" />} />
-        <Route path="/audits/:auditCycleId" element={<PlaceholderPage title="Audit Cycle Detail" />} />
-        <Route path="/reports" element={<PlaceholderPage title="Reports" />} />
-        <Route path="/activity-logs" element={<PlaceholderPage title="Activity Logs" />} />
+        <Route path="/assets" element={<AssetsPage />} />
+        <Route path="/assets/:assetId" element={<AssetDetailPage />} />
+        <Route path="/allocations" element={<AllocationsPage />} />
+        <Route path="/transfers" element={<TransfersPage />} />
+        <Route path="/bookings" element={<BookingsPage />} />
+        <Route path="/maintenance" element={<MaintenancePage />} />
+        <Route path="/audits" element={<AuditsPage />} />
+        <Route path="/audits/:auditCycleId" element={<AuditCycleDetailPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        {/* Admin only — Organization Setup (PS Screen 3) */}
+        <Route
+          path="/organization"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <OrganizationPage />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
-      {/* Default redirect */}
+      {/* Default */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

@@ -19,7 +19,3 @@ export const resetPassword = (payload) => {
 export const getMe = () => {
   return axiosClient.get("auth/me");
 };
-
-export const logout = () => {
-  return axiosClient.post("auth/logout");
-};

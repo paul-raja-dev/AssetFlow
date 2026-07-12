@@ -60,7 +60,7 @@ async def update_booking(
     current_user=Depends(get_current_user),
 ):
     updates = body.model_dump(exclude_none=True)
-    booking = await booking_service.update_booking(db, booking_id, actor_id=current_user.id, **updates)
+    booking = await booking_service.update_booking(db, booking_id, actor=current_user, **updates)
     return ok(data=BookingResponse.model_validate(booking).model_dump(by_alias=True), message="Booking updated")
 
 
@@ -70,5 +70,5 @@ async def cancel_booking(
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-    booking = await booking_service.cancel_booking(db, booking_id, actor_id=current_user.id)
+    booking = await booking_service.cancel_booking(db, booking_id, actor=current_user)
     return ok(data=BookingResponse.model_validate(booking).model_dump(by_alias=True), message="Booking cancelled")

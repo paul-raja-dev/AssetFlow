@@ -26,8 +26,8 @@ async def create_department(
     # head must be ASSET_MANAGER or ADMIN
     if head_id:
         head = await users_crud.get_by_id(db, head_id)
-        if not head or head.role not in ("ADMIN", "ASSET_MANAGER"):
-            raise AppError(400, "INVALID_HEAD_ROLE", "Department head must have ADMIN or ASSET_MANAGER role")
+        if not head or head.role not in ("ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD"):
+            raise AppError(400, "INVALID_HEAD_ROLE", "Department head must be an Admin, Asset Manager, or Department Head")
 
     return await dept_crud.create(
         db,
@@ -56,8 +56,8 @@ async def update_department(db: AsyncSession, dept_id: str, **updates) -> Depart
     # head role validation
     if "head_id" in updates and updates["head_id"]:
         head = await users_crud.get_by_id(db, updates["head_id"])
-        if not head or head.role not in ("ADMIN", "ASSET_MANAGER"):
-            raise AppError(400, "INVALID_HEAD_ROLE", "Department head must have ADMIN or ASSET_MANAGER role")
+        if not head or head.role not in ("ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD"):
+            raise AppError(400, "INVALID_HEAD_ROLE", "Department head must be an Admin, Asset Manager, or Department Head")
 
     return await dept_crud.update(db, dept, **updates)
 

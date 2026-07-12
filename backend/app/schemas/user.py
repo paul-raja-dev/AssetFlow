@@ -5,7 +5,7 @@ from pydantic import EmailStr
 
 from app.schemas.base import CamelModel
 
-UserRole = Literal["ADMIN", "ASSET_MANAGER", "EMPLOYEE"]
+UserRole = Literal["ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD", "EMPLOYEE"]
 UserStatus = Literal["ACTIVE", "INACTIVE"]
 
 

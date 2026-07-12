@@ -19,7 +19,7 @@ async def list_users(
     department_id: str | None = Query(None, alias="departmentId"),
     pagination: Pagination = Depends(),
     db: AsyncSession = Depends(get_db),
-    _=Depends(require_roles("ADMIN", "ASSET_MANAGER")),
+    _=Depends(require_roles("ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD")),
 ):
     import app.crud.users as users_crud
     query = await users_crud.list_users(db, search=search, role=role, status=status, department_id=department_id)

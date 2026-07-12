@@ -11,18 +11,19 @@ from app.exceptions import AppError
 from app.models.password_reset_token import PasswordResetToken
 
 
-async def signup(db: AsyncSession, email: str, password: str, first_name: str, last_name: str, role: str) -> dict:
+async def signup(db: AsyncSession, email: str, password: str, first_name: str, last_name: str) -> dict:
     existing = await users_crud.get_by_email(db, email)
     if existing:
         raise AppError(409, "EMAIL_ALREADY_EXISTS", "A user with this email already exists")
 
+    # Signup ALWAYS creates an EMPLOYEE — roles are assigned by Admin only.
     user = await users_crud.create(
         db,
         email=email.lower().strip(),
         password_hash=hash_password(password),
         first_name=first_name,
         last_name=last_name,
-        role=role,
+        role="EMPLOYEE",
     )
     token = create_access_token(user.id)
     return {"user": user, "access_token": token}

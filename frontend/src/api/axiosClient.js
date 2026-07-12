@@ -12,7 +12,7 @@ if (defaultURL && !defaultURL.endsWith("/")) {
 const axiosClient = axios.create({
   baseURL: defaultURL,
   headers: { "Content-Type": "application/json" },
-  timeout: 6000,
+  timeout: 15000,
 });
 
 axiosClient.interceptors.request.use((config) => {
@@ -58,10 +58,16 @@ axiosClient.interceptors.response.use(
       }
     }
 
-    const errBody = error.response?.data?.error ?? {
-      code: "NETWORK_ERROR",
-      message: error.message,
-    };
+    // Normalize to { code, message, details } — backend errors arrive as
+    // { success:false, message, error:{ code, details } }.
+    const body = error.response?.data;
+    const errBody = body
+      ? {
+          code: body.error?.code || "HTTP_ERROR",
+          message: body.message || "Request failed",
+          details: body.error?.details || {},
+        }
+      : { code: "NETWORK_ERROR", message: error.message, details: {} };
     return Promise.reject(errBody);
   }
 );

@@ -25,7 +25,6 @@ async def signup(body: SignupRequest, db: AsyncSession = Depends(get_db)):
         password=body.password,
         first_name=body.first_name,
         last_name=body.last_name,
-        role=body.role,
     )
     return ok(
         data={

@@ -40,9 +40,12 @@ class Booking(Base):
         if self.cancelled_at is not None:
             return "CANCELLED"
         now = datetime.now(timezone.utc)
-        if now < self.start_time:
+        # Some drivers return naive datetimes — treat them as UTC.
+        start = self.start_time if self.start_time.tzinfo else self.start_time.replace(tzinfo=timezone.utc)
+        end = self.end_time if self.end_time.tzinfo else self.end_time.replace(tzinfo=timezone.utc)
+        if now < start:
             return "UPCOMING"
-        if self.start_time <= now <= self.end_time:
+        if start <= now <= end:
             return "ONGOING"
         return "COMPLETED"
 

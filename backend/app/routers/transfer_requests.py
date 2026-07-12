@@ -66,7 +66,7 @@ async def approve(
     tr_id: str,
     body: TransferRequestUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(require_roles("ADMIN", "ASSET_MANAGER")),
+    current_user=Depends(require_roles("ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD")),
 ):
     tr = await transfer_service.approve_transfer_request(db, tr_id, current_user.id, body.notes)
     return ok(data=TransferRequestResponse.model_validate(tr).model_dump(by_alias=True), message="Transfer request approved")
@@ -77,7 +77,7 @@ async def reject(
     tr_id: str,
     body: TransferRequestUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(require_roles("ADMIN", "ASSET_MANAGER")),
+    current_user=Depends(require_roles("ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD")),
 ):
     tr = await transfer_service.reject_transfer_request(db, tr_id, current_user.id, body.notes)
     return ok(data=TransferRequestResponse.model_validate(tr).model_dump(by_alias=True), message="Transfer request rejected")

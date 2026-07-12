@@ -1,5 +1,3 @@
-from datetime import date
-
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -7,7 +5,7 @@ from app.core.database import get_db
 from app.core.responses import ok
 from app.dependencies.auth import get_current_user, require_roles
 from app.dependencies.pagination import Pagination, paginate
-from app.schemas.allocation import AllocationCreate, AllocationResponse
+from app.schemas.allocation import AllocationCreate, AllocationResponse, AllocationReturn
 from app.services import allocation_service
 
 router = APIRouter()
@@ -22,8 +20,16 @@ async def list_allocations(
     overdue_only: bool = Query(False, alias="overdueOnly"),
     pagination: Pagination = Depends(),
     db: AsyncSession = Depends(get_db),
-    _=Depends(require_roles("ADMIN", "ASSET_MANAGER")),
+    current_user=Depends(get_current_user),
 ):
+    """List allocations. Admin/AM see everything; a Department Head is scoped
+    to their department; an Employee is scoped to their own allocations."""
+    if current_user.role == "EMPLOYEE":
+        user_id = current_user.id
+    elif current_user.role == "DEPARTMENT_HEAD":
+        if not user_id or user_id != current_user.id:
+            department_id = current_user.department_id
+
     query = await allocation_service.list_allocations(
         db, asset_id=asset_id, user_id=user_id,
         department_id=department_id, status=status, overdue_only=overdue_only,
@@ -64,10 +70,16 @@ async def get_allocation(
 @router.patch("/{alloc_id}/return")
 async def return_asset(
     alloc_id: str,
+    body: AllocationReturn | None = None,
     db: AsyncSession = Depends(get_db),
     _=Depends(require_roles("ADMIN", "ASSET_MANAGER")),
 ):
-    alloc = await allocation_service.return_asset(db, alloc_id)
+    alloc = await allocation_service.return_asset(
+        db,
+        alloc_id,
+        condition=body.condition if body else None,
+        return_notes=body.return_notes if body else None,
+    )
     return ok(data=AllocationResponse.model_validate(alloc).model_dump(by_alias=True), message="Asset returned")
 
 

@@ -1,146 +1,144 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import AuthLayout from "../components/layout/AuthLayout";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import AuthShell from "../components/layout/AuthShell";
+import { Button, Field } from "../components/ui";
 import useAuth from "../hooks/useAuth";
-
-/* ─── shared inline styles ─────────────────────────────────────────────── */
-const label = {
-  display: "block",
-  marginBottom: 6,
-  fontSize: 13,
-  fontWeight: 500,
-  color: "var(--color-text-secondary)",
-};
-
-const inputStyle = {
-  display: "block",
-  width: "100%",
-  height: 38,
-  padding: "0 12px",
-  fontSize: 14,
-  color: "var(--color-text-primary)",
-  backgroundColor: "var(--color-input-bg)",
-  border: "1px solid var(--color-border)",
-  borderRadius: 8,
-  outline: "none",
-  transition: "border-color 0.15s",
-};
-
-const errorContainer = {
-  padding: "8px 12px",
-  backgroundColor: "var(--color-page)",
-  border: "1px solid #ef4444",
-  borderRadius: 6,
-  color: "#ef4444",
-  fontSize: 13,
-  fontWeight: 500,
-};
 
 export default function SignupPage() {
   const navigate = useNavigate();
   const { signup, login } = useAuth();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", password: "", confirm: "" });
+  const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const pwChecks = [
+    { ok: form.password.length >= 6, label: "At least 6 characters" },
+    { ok: form.password && form.password === form.confirm, label: "Passwords match" },
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    if (!name || !email || !password) {
-      setError("Please fill in all fields.");
+    if (!form.firstName.trim() || !form.email.trim() || !form.password) {
+      setError("Please fill in all required fields.");
       return;
     }
-
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+    if (form.password.length < 6) {
+      setError("Password must be at least 6 characters.");
       return;
     }
-
+    if (form.password !== form.confirm) {
+      setError("Passwords do not match.");
+      return;
+    }
     setLoading(true);
     try {
-      // 1. Create the account
-      await signup(name, email, password);
-      // 2. Perform automatic login to transition smoothly
-      await login(email, password);
+      await signup(`${form.firstName.trim()} ${form.lastName.trim()}`.trim(), form.email.trim(), form.password);
+      // auto-login for a smooth first-run experience
+      await login(form.email.trim(), form.password);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message || "Registration failed. Please try again.");
+      setError(err?.message || "Could not create your account. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AuthLayout
-      title="Create an account"
-      subtitle="Join your organization on AssetFlow"
-      submitText="Create account"
-      onSubmit={handleSubmit}
-      footerText="Already have an account?"
-      footerLinkText="Sign in"
-      footerLinkTo="/login"
-      loading={loading}
+    <AuthShell
+      title="Create your account"
+      subtitle="Join your organization's workspace as an employee."
+      footer={
+        <>
+          Already have an account?{" "}
+          <Link to="/login" className="font-semibold" style={{ color: "var(--color-primary)" }}>
+            Sign in
+          </Link>
+        </>
+      }
     >
-      {/* error banner */}
-      {error && <div style={errorContainer}>{error}</div>}
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        {error && (
+          <div
+            className="flex items-start gap-2 rounded-lg px-3 py-2.5 text-[13px] font-medium"
+            style={{ background: "var(--color-danger-bg)", color: "var(--color-danger)" }}
+            role="alert"
+          >
+            <AlertCircle size={15} className="mt-0.5 shrink-0" />
+            {error}
+          </div>
+        )}
 
-      {/* full name */}
-      <div>
-        <label htmlFor="signup-name" style={label}>
-          Full name
-        </label>
-        <input
-          id="signup-name"
-          type="text"
-          autoComplete="name"
-          placeholder="Jane Doe"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={inputStyle}
-          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
-          onBlur={(e) => (e.target.style.borderColor = "var(--color-border)")}
-        />
-      </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="First name" required>
+            <input className="input" placeholder="Priya" value={form.firstName} autoFocus onChange={set("firstName")} />
+          </Field>
+          <Field label="Last name">
+            <input className="input" placeholder="Sharma" value={form.lastName} onChange={set("lastName")} />
+          </Field>
+        </div>
 
-      {/* email */}
-      <div>
-        <label htmlFor="signup-email" style={label}>
-          Email address
-        </label>
-        <input
-          id="signup-email"
-          type="email"
-          autoComplete="email"
-          placeholder="you@company.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={inputStyle}
-          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
-          onBlur={(e) => (e.target.style.borderColor = "var(--color-border)")}
-        />
-      </div>
+        <Field label="Work email" required>
+          <input type="email" className="input" placeholder="you@company.com" autoComplete="email" value={form.email} onChange={set("email")} />
+        </Field>
 
-      {/* password */}
-      <div>
-        <label htmlFor="signup-password" style={label}>
-          Password
-        </label>
-        <input
-          id="signup-password"
-          type="password"
-          autoComplete="new-password"
-          placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={inputStyle}
-          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
-          onBlur={(e) => (e.target.style.borderColor = "var(--color-border)")}
-        />
-      </div>
-    </AuthLayout>
+        <Field label="Password" required>
+          <div className="relative">
+            <input
+              type={showPw ? "text" : "password"}
+              className="input pr-10"
+              placeholder="Minimum 6 characters"
+              autoComplete="new-password"
+              value={form.password}
+              onChange={set("password")}
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setShowPw((s) => !s)}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+        </Field>
+
+        <Field label="Confirm password" required>
+          <input
+            type={showPw ? "text" : "password"}
+            className="input"
+            placeholder="Re-enter your password"
+            autoComplete="new-password"
+            value={form.confirm}
+            onChange={set("confirm")}
+          />
+        </Field>
+
+        {form.password && (
+          <ul className="space-y-1">
+            {pwChecks.map(({ ok, label }) => (
+              <li key={label} className="flex items-center gap-1.5 text-[12px]" style={{ color: ok ? "var(--color-success)" : "var(--color-text-muted)" }}>
+                <CheckCircle2 size={13} /> {label}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading && <Loader2 size={15} className="animate-spin" />}
+          {loading ? "Creating account…" : "Create account"}
+        </Button>
+
+        <p className="text-center text-[12px]" style={{ color: "var(--color-text-muted)" }}>
+          Accounts are created with Employee access. Admins assign roles from the Employee Directory.
+        </p>
+      </form>
+    </AuthShell>
   );
 }

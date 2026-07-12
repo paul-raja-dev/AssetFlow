@@ -11,6 +11,7 @@ from sqlalchemy import (
     Text,
     func,
 )
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -50,6 +51,15 @@ class Allocation(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
+
+    @hybrid_property
+    def is_overdue(self) -> bool:
+        """ACTIVE allocation past its expected return date (PS: auto-flagged)."""
+        return (
+            self.status == "ACTIVE"
+            and self.expected_return_date is not None
+            and self.expected_return_date < date.today()
+        )
 
     __table_args__ = (
         CheckConstraint(
