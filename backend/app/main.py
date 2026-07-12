@@ -45,25 +45,13 @@ async def health():
     return JSONResponse(content={"success": True, "message": "AssetFlow API is running"})
 
 
-# ── Routers (uncomment as each phase is built) ────────────────────────────────
-# from app.routers import auth, users, departments, asset_categories
-# from app.routers import assets, allocations, transfer_requests, bookings
-# from app.routers import maintenance_requests, audit_cycles, audit_items
-# from app.routers import notifications, activity_logs, dashboard, reports, files
+# ── Routers ───────────────────────────────────────────────────────────────────
+from app.routers import auth, users  # noqa: E402
 
-# app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
-# app.include_router(users.router, prefix="/api/users", tags=["Users"])
+app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
+app.include_router(users.router, prefix="/api/users", tags=["Users"])
+
+# Departments & Categories — uncomment when friend's part is merged:
+# from app.routers import departments, asset_categories
 # app.include_router(departments.router, prefix="/api/departments", tags=["Departments"])
 # app.include_router(asset_categories.router, prefix="/api/asset-categories", tags=["Asset Categories"])
-# app.include_router(assets.router, prefix="/api/assets", tags=["Assets"])
-# app.include_router(allocations.router, prefix="/api/allocations", tags=["Allocations"])
-# app.include_router(transfer_requests.router, prefix="/api/transfer-requests", tags=["Transfer Requests"])
-# app.include_router(bookings.router, prefix="/api/bookings", tags=["Bookings"])
-# app.include_router(maintenance_requests.router, prefix="/api/maintenance-requests", tags=["Maintenance"])
-# app.include_router(audit_cycles.router, prefix="/api/audit-cycles", tags=["Audit Cycles"])
-# app.include_router(audit_items.router, prefix="/api/audit-items", tags=["Audit Items"])
-# app.include_router(notifications.router, prefix="/api/notifications", tags=["Notifications"])
-# app.include_router(activity_logs.router, prefix="/api/activity-logs", tags=["Activity Logs"])
-# app.include_router(dashboard.router, prefix="/api/dashboard", tags=["Dashboard"])
-# app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
-# app.include_router(files.router, prefix="/api/files", tags=["Files"])
