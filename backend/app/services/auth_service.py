@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import create_access_token, hash_password, verify_password
-from app.crud import users as users_crud
+import app.crud.users as users_crud
 from app.exceptions import AppError
 from app.models.password_reset_token import PasswordResetToken
 
